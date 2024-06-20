@@ -64,22 +64,27 @@ func (c *Client) CreatePasswordResetToken(ctx context.Context, input CreatePassw
 
 // ProcessPasswordResetInput represents the input required to process a password reset.
 type ProcessPasswordResetInput struct {
-	Token string `json:"token"`
-	// Add other necessary fields.
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
 }
 
-// ProcessPasswordReset processes the password reset using the provided token.
-func (c *Client) ProcessPasswordReset(ctx context.Context, input ProcessPasswordResetInput) error {
+// PasswordResetResponse represents the response from the password reset processing endpoint.
+type PasswordResetResponse struct {
+	Message string `json:"message"`
+}
+
+// ProcessPasswordReset processes a password reset using the provided token and new password.
+func (c *Client) ProcessPasswordReset(ctx context.Context, input ProcessPasswordResetInput) (*PasswordResetResponse, error) {
 	// Prepare the payload.
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
-		return fmt.Errorf("error marshalling payload: %w", err)
+		return nil, fmt.Errorf("error marshalling payload: %w", err)
 	}
 
 	// Prepare the request.
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/passwordreset", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/processpasswordreset", bytes.NewBuffer(payloadBytes))
 	if err != nil {
-		return fmt.Errorf("error creating request: %w", err)
+		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
 	// Set headers.
@@ -90,15 +95,21 @@ func (c *Client) ProcessPasswordReset(ctx context.Context, input ProcessPassword
 	// Send the request.
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("error sending request: %w", err)
+		return nil, fmt.Errorf("error sending request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	return nil
+	// Parse the response.
+	var passwordResetResponse PasswordResetResponse
+	if err := json.NewDecoder(resp.Body).Decode(&passwordResetResponse); err != nil {
+		return nil, fmt.Errorf("error decoding response: %w", err)
+	}
+
+	return &passwordResetResponse, nil
 }
 
 // GetPasswordResetTokensByUserIDInput represents the input required to get password reset tokens by user ID
