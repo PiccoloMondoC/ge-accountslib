@@ -117,22 +117,22 @@ type GetPasswordResetTokensByUserIDInput struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-// GetPasswordResetTokensByUserID retrieves password reset tokens for the user by their user ID
-func (c *Client) GetPasswordResetTokensByUserID(input GetPasswordResetTokensByUserIDInput) ([]PasswordResetToken, error) {
-	// Prepare the URL with the user ID
+// GetPasswordResetTokensByUserID retrieves password reset tokens for the user by their user ID.
+func (c *Client) GetPasswordResetTokensByUserID(ctx context.Context, input GetPasswordResetTokensByUserIDInput) ([]PasswordResetToken, error) {
+	// Prepare the URL with the user ID.
 	url := fmt.Sprintf("%s/passwordresettokens?user_id=%s", c.BaseURL, input.UserID.String())
 
-	// Prepare the request
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	// Prepare the request.
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
-	// Set headers
+	// Set headers.
 	req.Header.Set("Authorization", "Bearer "+c.Token)
 	req.Header.Set("X-Api-Key", c.ApiKey)
 
-	// Send the request
+	// Send the request.
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
@@ -143,7 +143,7 @@ func (c *Client) GetPasswordResetTokensByUserID(input GetPasswordResetTokensByUs
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// Parse the response
+	// Parse the response.
 	var tokens []PasswordResetToken
 	if err := json.NewDecoder(resp.Body).Decode(&tokens); err != nil {
 		return nil, fmt.Errorf("error decoding response: %w", err)
@@ -157,26 +157,26 @@ type GetPasswordResetTokenByPlaintextInput struct {
 	Plaintext string `json:"plaintext"`
 }
 
-// GetPasswordResetTokenByPlaintext retrieves a password reset token by its plaintext
-func (c *Client) GetPasswordResetTokenByPlaintext(input GetPasswordResetTokenByPlaintextInput) (*PasswordResetToken, error) {
-	// Prepare the payload
+// GetPasswordResetTokenByPlaintext retrieves a password reset token by its plaintext.
+func (c *Client) GetPasswordResetTokenByPlaintext(ctx context.Context, input GetPasswordResetTokenByPlaintextInput) (*PasswordResetToken, error) {
+	// Prepare the payload.
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling payload: %w", err)
 	}
 
-	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/passwordresettoken", bytes.NewBuffer(payloadBytes))
+	// Prepare the request.
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/passwordresettoken", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 
-	// Set headers
+	// Set headers.
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.Token)
 	req.Header.Set("X-Api-Key", c.ApiKey)
 
-	// Send the request
+	// Send the request.
 	resp, err := c.HttpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
@@ -187,7 +187,7 @@ func (c *Client) GetPasswordResetTokenByPlaintext(input GetPasswordResetTokenByP
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	// Parse the response
+	// Parse the response.
 	var token PasswordResetToken
 	if err := json.NewDecoder(resp.Body).Decode(&token); err != nil {
 		return nil, fmt.Errorf("error decoding response: %w", err)
@@ -202,7 +202,7 @@ type DeletePasswordResetTokenInput struct {
 }
 
 // DeletePasswordResetToken deletes a password reset token
-func (c *Client) DeletePasswordResetToken(input DeletePasswordResetTokenInput) error {
+func (c *Client) DeletePasswordResetToken(ctx context.Context, input DeletePasswordResetTokenInput) error {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -210,7 +210,7 @@ func (c *Client) DeletePasswordResetToken(input DeletePasswordResetTokenInput) e
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/passwordresettokens/"+input.TokenID.String(), bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/passwordresettokens/"+input.TokenID.String(), bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -240,9 +240,9 @@ type DeletePasswordResetTokenByUserIDInput struct {
 }
 
 // DeletePasswordResetTokenByUserID deletes password reset tokens for a specific user ID
-func (c *Client) DeletePasswordResetTokenByUserID(input DeletePasswordResetTokenByUserIDInput) error {
+func (c *Client) DeletePasswordResetTokenByUserID(ctx context.Context, input DeletePasswordResetTokenByUserIDInput) error {
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/passwordresettokens/user/"+input.UserID.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/passwordresettokens/user/"+input.UserID.String(), nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -270,9 +270,9 @@ func (c *Client) DeletePasswordResetTokenByUserID(input DeletePasswordResetToken
 type DeleteExpiredPasswordResetTokensInput struct{}
 
 // DeleteExpiredPasswordResetTokens deletes expired password reset tokens
-func (c *Client) DeleteExpiredPasswordResetTokens(input DeleteExpiredPasswordResetTokensInput) error {
+func (c *Client) DeleteExpiredPasswordResetTokens(ctx context.Context, input DeleteExpiredPasswordResetTokensInput) error {
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/passwordresettokens/expired", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/passwordresettokens/expired", nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -302,14 +302,14 @@ type VerifyPasswordResetTokenInput struct {
 }
 
 // VerifyPasswordResetToken verifies a password reset token
-func (c *Client) VerifyPasswordResetToken(input VerifyPasswordResetTokenInput) (*PasswordResetToken, error) {
+func (c *Client) VerifyPasswordResetToken(ctx context.Context, input VerifyPasswordResetTokenInput) (*PasswordResetToken, error) {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling payload: %w", err)
 	}
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/passwordresettokens/verify", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/passwordresettokens/verify", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
