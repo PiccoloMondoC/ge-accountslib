@@ -338,3 +338,46 @@ func (c *Client) VerifyPasswordResetToken(input VerifyPasswordResetTokenInput) (
 
 	return &verifiedPasswordResetToken, nil
 }
+
+// ValidatePasswordResetTokenInput represents the input required to validate a password reset token
+type ValidatePasswordResetTokenInput struct {
+	Token string `json:"token"`
+}
+
+// ValidatePasswordResetToken validates a password reset token
+func (c *Client) ValidatePasswordResetToken(input ValidatePasswordResetTokenInput) (*PasswordResetToken, error) {
+	// Prepare the payload
+	payloadBytes, err := json.Marshal(input)
+	if err != nil {
+		return nil, fmt.Errorf("error marshalling payload: %w", err)
+	}
+	// Prepare the request
+	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/passwordresettokens/validate", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.Token)
+	req.Header.Set("X-Api-Key", c.ApiKey)
+
+	// Send the request
+	resp, err := c.HttpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error sending request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	// Parse the response
+	var validatedPasswordResetToken PasswordResetToken
+	if err := json.NewDecoder(resp.Body).Decode(&validatedPasswordResetToken); err != nil {
+		return nil, fmt.Errorf("error decoding response: %w", err)
+	}
+
+	return &validatedPasswordResetToken, nil
+}

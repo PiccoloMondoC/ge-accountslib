@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Client represents an HTTP client that represents the client
+// Client represents an HTTP client that interacts with the API.
 type Client struct {
 	BaseURL    string
 	HttpClient *http.Client
@@ -14,6 +14,7 @@ type Client struct {
 	ApiKey     string
 }
 
+// NewClient initializes and returns a new Client.
 func NewClient(baseURL string, token string, apiKey string, httpClient ...*http.Client) *Client {
 	var client *http.Client
 	if len(httpClient) > 0 {
