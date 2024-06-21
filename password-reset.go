@@ -345,14 +345,14 @@ type ValidatePasswordResetTokenInput struct {
 }
 
 // ValidatePasswordResetToken validates a password reset token
-func (c *Client) ValidatePasswordResetToken(input ValidatePasswordResetTokenInput) (*PasswordResetToken, error) {
+func (c *Client) ValidatePasswordResetToken(ctx context.Context, input ValidatePasswordResetTokenInput) (*PasswordResetToken, error) {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
 		return nil, fmt.Errorf("error marshalling payload: %w", err)
 	}
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/passwordresettokens/validate", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/passwordresettokens/validate", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
