@@ -70,7 +70,8 @@ type ProcessPasswordResetInput struct {
 
 // PasswordResetResponse represents the response from the password reset processing endpoint.
 type PasswordResetResponse struct {
-	Message string `json:"message"`
+	Message string    `json:"message"`
+	UserID  uuid.UUID `json:"user_id"`
 }
 
 // ProcessPasswordReset processes a password reset using the provided token and new password.
