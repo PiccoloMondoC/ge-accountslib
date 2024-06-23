@@ -13,9 +13,10 @@ import (
 
 // PasswordResetToken represents a password reset token record in the database
 type PasswordResetToken struct {
-	Token  string    `json:"token"`
-	UserID uuid.UUID `json:"user_id"`
-	Expiry string    `json:"expiry"`
+	Token     string    `json:"token"`
+	UserID    uuid.UUID `json:"user_id"`
+	CreatedAt string    `json:"created_at"`
+	Expiry    string    `json:"expiry"`
 }
 
 // CreatePasswordResetTokenInput represents the input required to create a password reset token.
