@@ -70,6 +70,9 @@ func (c *Client) ChangePassword(ctx context.Context, input ChangePasswordInput) 
 		return nil, fmt.Errorf("error decoding response: %w", err)
 	}
 
+	// Set the UserID field from the input.
+	changePasswordResponse.UserID = input.UserID
+
 	return &changePasswordResponse, nil
 }
 
