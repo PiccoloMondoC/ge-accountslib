@@ -30,7 +30,8 @@ type ChangePasswordInput struct {
 
 // ChangePasswordResponse represents the response from the password change endpoint.
 type ChangePasswordResponse struct {
-	Message string `json:"message"`
+	Message string    `json:"message"`
+	UserID  uuid.UUID `json:"user_id"` // Add the UserID field
 }
 
 // ChangePassword initiates a password change request using the provided user ID and new password.
