@@ -61,6 +61,44 @@ func (c *Client) CreateActivationToken(input CreateActivationTokenInput) (*Activ
 	return &createdActivationToken, nil
 }
 
+// ActivationUserInput represents the input required to activate a user
+type ActivationUserInput struct {
+	Token string `json:"token"`
+}
+
+// ActivateUser sends a request to activate a user with the given token
+func (c *Client) ActivateUser(input ActivationUserInput) error {
+	// Prepare the payload
+	payloadBytes, err := json.Marshal(input)
+	if err != nil {
+		return fmt.Errorf("error marshalling payload: %w", err)
+	}
+
+	// Prepare the request
+	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/activate", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return fmt.Errorf("error creating request: %w", err)
+	}
+
+	// Set headers
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.Token)
+	req.Header.Set("X-Api-Key", c.ApiKey)
+
+	// Send the request
+	resp, err := c.HttpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("error sending request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
 // GetActivationTokensByUserIDInput represents the input required to get activation tokens by user ID
 type GetActivationTokensByUserIDInput struct {
 	UserID uuid.UUID `json:"user_id"`
