@@ -68,7 +68,7 @@ type ActivationUserInput struct {
 }
 
 // ActivateUser sends a request to activate a user with the given token
-func (c *Client) ActivateUser(input ActivationUserInput) error {
+func (c *Client) ActivateUser(ctx context.Context, input ActivationUserInput) error {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -76,7 +76,7 @@ func (c *Client) ActivateUser(input ActivationUserInput) error {
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/activate", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/activate", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -106,7 +106,7 @@ type GetActivationTokensByUserIDInput struct {
 }
 
 // GetActivationTokensByUserID fetches all activation tokens for a given user ID
-func (c *Client) GetActivationTokensByUserID(input GetActivationTokensByUserIDInput) ([]ActivationToken, error) {
+func (c *Client) GetActivationTokensByUserID(ctx context.Context, input GetActivationTokensByUserIDInput) ([]ActivationToken, error) {
 	// Prepare the URL
 	url, err := url.Parse(fmt.Sprintf("%s/activationtokens", c.BaseURL))
 	if err != nil {
@@ -119,7 +119,7 @@ func (c *Client) GetActivationTokensByUserID(input GetActivationTokensByUserIDIn
 	url.RawQuery = query.Encode()
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
@@ -155,7 +155,7 @@ type GetActivationTokenByPlaintextInput struct {
 }
 
 // GetActivationTokenByPlaintext retrieves an activation token by its plaintext value
-func (c *Client) GetActivationTokenByPlaintext(input GetActivationTokenByPlaintextInput) (*ActivationToken, error) {
+func (c *Client) GetActivationTokenByPlaintext(ctx context.Context, input GetActivationTokenByPlaintextInput) (*ActivationToken, error) {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -163,7 +163,7 @@ func (c *Client) GetActivationTokenByPlaintext(input GetActivationTokenByPlainte
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/activationtokens/retrieve", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/activationtokens/retrieve", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
@@ -198,7 +198,7 @@ type DeleteActivationTokenInput struct {
 	TokenID uuid.UUID `json:"token_id"`
 }
 
-func (c *Client) DeleteActivationToken(input DeleteActivationTokenInput) error {
+func (c *Client) DeleteActivationToken(ctx context.Context, input DeleteActivationTokenInput) error {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -206,7 +206,7 @@ func (c *Client) DeleteActivationToken(input DeleteActivationTokenInput) error {
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/activationtokens/"+input.TokenID.String(), bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/activationtokens/"+input.TokenID.String(), bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -235,7 +235,7 @@ type DeleteActivationTokenByUserIDInput struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-func (c *Client) DeleteActivationTokenByUserID(input DeleteActivationTokenByUserIDInput) error {
+func (c *Client) DeleteActivationTokenByUserID(ctx context.Context, input DeleteActivationTokenByUserIDInput) error {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -243,7 +243,7 @@ func (c *Client) DeleteActivationTokenByUserID(input DeleteActivationTokenByUser
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/activationtokens/user/"+input.UserID.String(), bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/activationtokens/user/"+input.UserID.String(), bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
