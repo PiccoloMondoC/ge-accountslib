@@ -268,9 +268,9 @@ func (c *Client) DeleteActivationTokenByUserID(ctx context.Context, input Delete
 }
 
 // DeleteExpiredActivationTokens deletes expired activation tokens
-func (c *Client) DeleteExpiredActivationTokens() error {
+func (c *Client) DeleteExpiredActivationTokens(ctx context.Context) error {
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodDelete, c.BaseURL+"/activationtokens/expired", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, c.BaseURL+"/activationtokens/expired", nil)
 	if err != nil {
 		return fmt.Errorf("error creating request: %w", err)
 	}
@@ -295,7 +295,7 @@ func (c *Client) DeleteExpiredActivationTokens() error {
 }
 
 // VerifyActivationToken verifies the provided activation token
-func (c *Client) VerifyActivationToken(token string) (*ActivationToken, error) {
+func (c *Client) VerifyActivationToken(ctx context.Context, token string) (*ActivationToken, error) {
 	// Prepare the payload
 	payload := map[string]string{"token": token}
 	payloadBytes, err := json.Marshal(payload)
@@ -304,7 +304,7 @@ func (c *Client) VerifyActivationToken(token string) (*ActivationToken, error) {
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/activationtokens/verify", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/activationtokens/verify", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
