@@ -62,13 +62,13 @@ func (c *Client) CreateActivationToken(ctx context.Context, input CreateActivati
 	return &createdActivationToken, nil
 }
 
-// ActivationUserInput represents the input required to activate a user
-type ActivationUserInput struct {
+// ActivateUserInput represents the input required to activate a user
+type ActivateUserInput struct {
 	Token string `json:"token"`
 }
 
 // ActivateUser sends a request to activate a user with the given token
-func (c *Client) ActivateUser(ctx context.Context, input ActivationUserInput) error {
+func (c *Client) ActivateUser(ctx context.Context, input ActivateUserInput) error {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
