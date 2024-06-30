@@ -3,6 +3,7 @@ package accountslib
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -23,7 +24,7 @@ type CreateActivationTokenInput struct {
 	UserID uuid.UUID `json:"user_id"`
 }
 
-func (c *Client) CreateActivationToken(input CreateActivationTokenInput) (*ActivationToken, error) {
+func (c *Client) CreateActivationToken(ctx context.Context, input CreateActivationTokenInput) (*ActivationToken, error) {
 	// Prepare the payload
 	payloadBytes, err := json.Marshal(input)
 	if err != nil {
@@ -31,7 +32,7 @@ func (c *Client) CreateActivationToken(input CreateActivationTokenInput) (*Activ
 	}
 
 	// Prepare the request
-	req, err := http.NewRequest(http.MethodPost, c.BaseURL+"/activationtokens", bytes.NewBuffer(payloadBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.BaseURL+"/activationtokens", bytes.NewBuffer(payloadBytes))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
